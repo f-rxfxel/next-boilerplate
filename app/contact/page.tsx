@@ -1,16 +1,16 @@
 'use client'
 import { unstable_ViewTransition as ViewTransition } from 'react'
 
-export default function Home() {
+export default function Contact() {
   return (
     <ViewTransition>
       <section className='text-gray-600 body-font'>
         <h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white'>
-          Início
+          Contato
         </h1>
         <p className='lg:w-2/3 mx-auto leading-relaxed text-base'>
-          Bem-vindo à nossa página inicial! Aqui você encontrará as últimas
-          novidades e atualizações sobre nossos produtos e serviços.
+          Entre em contato conosco preenchendo o formulário abaixo. Retornaremos
+          o mais breve possível!
         </p>
       </section>
     </ViewTransition>
