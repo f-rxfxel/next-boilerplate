@@ -1,18 +1,36 @@
 'use client'
+import { Footer } from '@/components/footer'
+import { SunBeams } from '@/components/sun-beams'
 import { unstable_ViewTransition as ViewTransition } from 'react'
+import { motion } from 'motion/react'
+import { Tenor_Sans } from 'next/font/google'
+
+const tenor = Tenor_Sans({ subsets: ['latin'], weight: '400' })
 
 export default function Home() {
   return (
     <ViewTransition>
-      <section className='text-gray-600 body-font'>
-        <h1 className='sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900 dark:text-white'>
-          Início
-        </h1>
-        <p className='lg:w-2/3 mx-auto leading-relaxed text-base'>
-          Bem-vindo à nossa página inicial! Aqui você encontrará as últimas
-          novidades e atualizações sobre nossos produtos e serviços.
-        </p>
-      </section>
+      <SunBeams intensity='strong'>
+        <main className='h-screen flex flex-col items-center justify-center'>
+          <motion.h2
+            initial={{ filter: 'blur(20px)', opacity: 0 }}
+            animate={{ filter: 'blur(0px)', opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            className={`${tenor.className} text-5xl text-center tracking-[15px]`}
+          >
+            MAGNA
+          </motion.h2>
+          <motion.p
+            className='text-xl tracking-wide text-center font-light text-muted-foreground'
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            Seu acesso exclusivo ao extraordinário.
+          </motion.p>
+        </main>
+        <Footer />
+      </SunBeams>
     </ViewTransition>
   )
 }
