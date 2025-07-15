@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { ModeToggle } from './theme-switcher'
 import { GlassContainer } from './glass-card'
+import { LoginModal } from './ui/login-modal'
 
 interface FooterLink {
   title: string
@@ -63,7 +64,10 @@ export function Footer() {
             <p className='text-muted-foreground mt-8 text-sm md:mt-0'>
               © {new Date().getFullYear()} MAGNA. Todos os direitos reservados.
             </p>
-            <ModeToggle />
+            <div className='flex gap-2 items-center'>
+              <ModeToggle />
+              <LoginModal />
+            </div>
           </AnimatedContainer>
 
           <div className='mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 xl:col-span-2 xl:mt-0'>

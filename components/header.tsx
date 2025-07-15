@@ -8,7 +8,7 @@ import SearchModal from './ui/search-modal'
 import { GlassContainer } from './glass-card'
 
 const navLinks = [
-  { name: 'Imóveis', path: '/contact' },
+  { name: 'Imóveis', path: '/imoveis' },
   { name: 'Agentes', path: '/about' },
 ]
 
