@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { motion } from 'motion/react'
+import { motion, useMotionValue, animate } from 'motion/react'
 import { cn } from '@/lib/utils'
+import { usePathname } from 'next/navigation'
 
 interface AnimatedGradientBackgroundProps {
   className?: string
@@ -39,7 +40,7 @@ function createBeam(width: number, height: number): Beam {
 }
 export function SunBeams({
   className,
-  intensity = 'strong',
+  intensity,
   children,
 }: AnimatedGradientBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -47,14 +48,24 @@ export function SunBeams({
   const beamsRef = useRef<Beam[]>([])
   const animationFrameRef = useRef<number>(0)
   const MINIMUM_BEAMS = 20
+  const pathname = usePathname()
+  const resolvedIntensity = intensity ?? getSunBeamsIntensity(pathname)
+
+  // Smooth transition for opacity
+  const opacityMap = {
+    subtle: 0.3,
+    medium: 0.8,
+    strong: 1,
+  }
+  const animatedOpacity = useMotionValue(opacityMap[resolvedIntensity])
+  useEffect(() => {
+    animate(animatedOpacity, opacityMap[resolvedIntensity], {
+      duration: 1.2,
+      ease: 'easeInOut',
+    })
+  }, [resolvedIntensity])
 
   useEffect(() => {
-    const opacityMap = {
-      subtle: 0.5,
-      medium: 0.8,
-      strong: 1,
-    }
-
     const canvas = canvasRef.current
     const container = containerRef.current
     if (!canvas || !container) return
@@ -105,7 +116,7 @@ export function SunBeams({
       const pulsingOpacity =
         beam.opacity *
         (0.8 + Math.sin(beam.pulse) * 0.2) *
-        opacityMap[intensity]
+        animatedOpacity.get()
 
       const gradient = ctx.createLinearGradient(0, 0, 0, beam.length)
 
@@ -133,7 +144,7 @@ export function SunBeams({
       ctx.restore()
     }
 
-    function animate() {
+    function animateBeams() {
       if (!canvas || !ctx) return
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -151,10 +162,10 @@ export function SunBeams({
         drawBeam(ctx, beam)
       })
 
-      animationFrameRef.current = requestAnimationFrame(animate)
+      animationFrameRef.current = requestAnimationFrame(animateBeams)
     }
 
-    animate()
+    animateBeams()
 
     return () => {
       window.removeEventListener('resize', updateCanvasSize)
@@ -162,7 +173,7 @@ export function SunBeams({
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [intensity])
+  }, [animatedOpacity])
 
   return (
     <div
@@ -177,12 +188,11 @@ export function SunBeams({
     >
       <canvas
         ref={canvasRef}
-        className='absolute inset-0'
+        className='absolute inset-0 z-0 pointer-events-none'
         style={{ filter: 'blur(15px)' }}
       />
-
       <motion.div
-        className='absolute inset-0 bg-white-950/5'
+        className='absolute inset-0 bg-white-950/5 z-0 pointer-events-none'
         animate={{
           opacity: [0.05, 0.15, 0.05],
         }}
@@ -195,8 +205,23 @@ export function SunBeams({
           backdropFilter: 'blur(50px)',
         }}
       />
-
-      {children && <div>{children}</div>}
+      {children && <div className='relative z-10'>{children}</div>}
     </div>
   )
+}
+
+export function getSunBeamsIntensity(
+  pathname?: string
+): 'subtle' | 'medium' | 'strong' {
+  if (!pathname) {
+    if (typeof window !== 'undefined') {
+      pathname = window.location.pathname
+    } else {
+      return 'strong'
+    }
+  }
+  if (pathname === '/') return 'strong'
+  if (pathname.startsWith('/imoveis') || pathname.startsWith('/about'))
+    return 'subtle'
+  return 'medium'
 }

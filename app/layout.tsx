@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { ThemeProvider } from '../components/theme-provider'
 import Header from '@/components/header'
+import { SunBeams } from '@/components/sun-beams'
+import { Footer } from '@/components/footer'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -23,7 +25,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Header />
-          {children}
+          <SunBeams>
+            {children}
+            <Footer />
+          </SunBeams>
         </ThemeProvider>
       </body>
     </html>
