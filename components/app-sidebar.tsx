@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/sidebar'
 import { motion } from 'framer-motion'
 import { Tenor_Sans } from 'next/font/google'
+import { usePathname } from 'next/navigation'
+import { ModeToggle } from './theme-switcher'
 
 const tenor = Tenor_Sans({ subsets: ['latin'], weight: '400' })
 
@@ -43,6 +45,7 @@ const navigation = [
 ]
 
 export function AppSidebar() {
+  const pathname = usePathname()
   return (
     <Sidebar>
       <SidebarHeader className='border-b border-sidebar-border'>
@@ -65,16 +68,26 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navegação</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navigation.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <Link href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {navigation.map((item) => {
+                const isActive = pathname === item.url
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link
+                        href={item.url}
+                        className={
+                          isActive
+                            ? 'bg-primary/10 text-primary transition-colors duration-150' // destaque com transição
+                            : 'hover:bg-muted/50 transition-colors duration-150'
+                        }
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -82,8 +95,17 @@ export function AppSidebar() {
       <SidebarFooter className='border-t border-sidebar-border'>
         <SidebarMenu>
           <SidebarMenuItem>
+            <ModeToggle />
+
             <SidebarMenuButton asChild>
-              <Link href='/settings'>
+              <Link
+                href='/settings'
+                className={
+                  pathname === '/settings'
+                    ? 'bg-primary/10 text-primary font-semibold transition-colors duration-150'
+                    : 'hover:bg-muted/50 transition-colors duration-150'
+                }
+              >
                 <Settings />
                 <span>Configurações</span>
               </Link>
