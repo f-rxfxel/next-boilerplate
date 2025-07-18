@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useMotionValue, animate } from 'motion/react'
 import { cn } from '@/lib/utils'
 import { usePathname } from 'next/navigation'
@@ -23,21 +23,6 @@ interface Beam {
   pulse: number
   pulseSpeed: number
 }
-function createBeam(width: number, height: number): Beam {
-  const angle = -35 + Math.random() * 10
-  return {
-    x: Math.random() * width * 1.5 - width * 0.25,
-    y: Math.random() * height * 1.5 - height * 0.25,
-    width: 30 + Math.random() * 60,
-    length: height * 2.5,
-    angle: angle,
-    speed: 0.6 + Math.random() * 1.2,
-    opacity: 0.12 + Math.random() * 0.16,
-    hue: 10 + Math.random() * 50,
-    pulse: Math.random() * Math.PI * 2,
-    pulseSpeed: 0.02 + Math.random() * 0.03,
-  }
-}
 export function SunBeams({
   className,
   intensity,
@@ -50,6 +35,27 @@ export function SunBeams({
   const MINIMUM_BEAMS = 20
   const pathname = usePathname()
   const resolvedIntensity = intensity ?? getSunBeamsIntensity(pathname)
+  const [isDark, setIsDark] = useState(false)
+
+  function createBeamWithTheme(width: number, height: number): Beam {
+    const angle = -35 + Math.random() * 10
+    // Quentes no dark, frios (azul/roxo) no light
+    const hue = isDark
+      ? 10 + Math.random() * 50 // quentes: laranja, amarelo, vermelho
+      : 210 + Math.random() * 40 // frios: azul (210-240), roxo (até 250)
+    return {
+      x: Math.random() * width * 1.5 - width * 0.25,
+      y: Math.random() * height * 1.5 - height * 0.25,
+      width: 30 + Math.random() * 60,
+      length: height * 2.5,
+      angle: angle,
+      speed: 0.6 + Math.random() * 1.2,
+      opacity: 0.12 + Math.random() * 0.16,
+      hue: hue,
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: 0.02 + Math.random() * 0.03,
+    }
+  }
 
   // Smooth transition for opacity
   const opacityMap = {
@@ -85,7 +91,7 @@ export function SunBeams({
 
       const totalBeams = MINIMUM_BEAMS * 1.5
       beamsRef.current = Array.from({ length: totalBeams }, () =>
-        createBeam(canvas.width, canvas.height)
+        createBeamWithTheme(canvas.width, canvas.height)
       )
     }
 
@@ -94,18 +100,14 @@ export function SunBeams({
 
     function resetBeam(beam: Beam, index: number, totalBeams: number) {
       if (!canvas) return beam
-
+      // Cria um novo beam com a cor correta do tema
+      const newBeam = createBeamWithTheme(canvas.width, canvas.height)
+      // Mantém a posição x baseada na coluna para manter o padrão
       const column = index % 3
       const spacing = canvas.width / 3
-
-      beam.y = canvas.height + 100
-      beam.x =
+      newBeam.x =
         column * spacing + spacing / 2 + (Math.random() - 0.5) * spacing * 0.5
-      beam.width = 100 + Math.random() * 100
-      beam.speed = 0.5 + Math.random() * 0.4
-      beam.hue = 10 + (index * 50) / totalBeams
-      beam.opacity = 0.2 + Math.random() * 0.1
-      return beam
+      return Object.assign(beam, newBeam)
     }
 
     function drawBeam(ctx: CanvasRenderingContext2D, beam: Beam) {
@@ -174,6 +176,33 @@ export function SunBeams({
       }
     }
   }, [animatedOpacity])
+
+  useEffect(() => {
+    // Detecta tema inicial
+    const checkTheme = () => {
+      if (typeof window !== 'undefined') {
+        setIsDark(document.documentElement.classList.contains('dark'))
+      }
+    }
+    checkTheme()
+    // Observa mudanças de tema
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    })
+    return () => observer.disconnect()
+  }, [])
+
+  // Recria todos os beams ao trocar de tema
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const totalBeams = MINIMUM_BEAMS * 1.5
+    beamsRef.current = Array.from({ length: totalBeams }, () =>
+      createBeamWithTheme(canvas.width, canvas.height)
+    )
+  }, [isDark])
 
   return (
     <div
