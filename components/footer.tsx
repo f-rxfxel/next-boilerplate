@@ -12,6 +12,8 @@ import {
 import { ModeToggle } from './theme-switcher'
 import { GlassContainer } from './glass-card'
 import { LoginModal } from './ui/login-modal'
+import Link from 'next/link'
+import { Button } from './ui/button'
 
 interface FooterLink {
   title: string
@@ -67,6 +69,9 @@ export function Footer() {
             <div className='flex gap-2 items-center'>
               <ModeToggle />
               <LoginModal />
+              <Button variant='outline' asChild>
+                <Link href='/painel'>Painel</Link>
+              </Button>
             </div>
           </AnimatedContainer>
 

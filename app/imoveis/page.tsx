@@ -8,6 +8,7 @@ import { Libre_Caslon_Text } from 'next/font/google'
 import { motion } from 'motion/react'
 import { GlassContainer } from '@/components/glass-card'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const libreCaslonText = Libre_Caslon_Text({
   subsets: ['latin'],
@@ -26,27 +27,24 @@ export default function Component() {
     requestAnimationFrame(raf)
   }, [])
 
+  // TODO se der error, chamar 'throw new Error("Erro ao carregar os imóveis")'
+  // TODO ajustar o roteamento para o id do imóvel correto
+  const imovelId = 1
+
   return (
     <ViewTransition>
       <main className='min-h-screen flex flex-col'>
         <section className='mx-6 mt-24 md:mx-32 md:mt-32 lg:mx-44 lg:mt-64 flex flex-col gap-4'>
           <HeroTitle />
           <div className='flex flex-col gap-6 mt-12 md:mt-16 lg:mt-24'>
-            <img
-              src='https://images.unsplash.com/photo-1612801356940-8fdcde8aef61?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-              alt='Imóvel'
-              className='w-full h-64 object-cover rounded-3xl shadow-lg'
-            />
-            <img
-              src='https://images.unsplash.com/photo-1612801356940-8fdcde8aef61?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-              alt='Imóvel'
-              className='w-full h-64 object-cover rounded-3xl shadow-lg'
-            />
-            <img
-              src='https://images.unsplash.com/photo-1612801356940-8fdcde8aef61?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
-              alt='Imóvel'
-              className='w-full h-64 object-cover rounded-3xl shadow-lg'
-            />
+            <ul>
+              <li>
+                <Link href={`/imoveis/${imovelId}`}>Imóvel 1</Link>
+              </li>
+              <li>
+                <Link href={`/imoveis/${imovelId}`}>Imóvel 2</Link>
+              </li>
+            </ul>
           </div>
         </section>
       </main>

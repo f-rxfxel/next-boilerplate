@@ -10,7 +10,7 @@ import { GlassContainer } from './glass-card'
 const navLinks = [
   { name: 'Início', path: '/' },
   { name: 'Imóveis', path: '/imoveis' },
-  { name: 'Agentes', path: '/about' },
+  { name: 'Agentes', path: '/agentes' },
 ]
 
 const Header = () => {
