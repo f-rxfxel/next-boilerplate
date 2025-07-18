@@ -24,11 +24,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <SunBeams>
-            {children}
-            <Footer />
-          </SunBeams>
+          <SunBeams>{children}</SunBeams>
         </ThemeProvider>
       </body>
     </html>

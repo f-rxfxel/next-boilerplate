@@ -19,14 +19,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang='en'>
-      <body className={inter.className}>
-        <SidebarProvider defaultOpen={true}>
-          <AppSidebar />
-          <main className='flex-1 overflow-auto'>{children}</main>
-          <Toaster />
-        </SidebarProvider>
-      </body>
-    </html>
+    <SidebarProvider defaultOpen={true}>
+      <AppSidebar />
+      <main className='flex-1 overflow-auto'>{children}</main>
+      <Toaster />
+    </SidebarProvider>
   )
 }
