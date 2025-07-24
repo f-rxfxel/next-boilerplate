@@ -1,16 +1,13 @@
 import type React from 'react'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
 import { Toaster } from '@/components/ui/toaster'
 
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata: Metadata = {
-  title: 'RealEstate Pro - Agent Dashboard',
-  description: 'Professional real estate management platform for agents',
-  generator: 'v0.dev',
+  title: 'MAGNA • Painel',
+  description:
+    'Plataforma imobiliária completa para listar, buscar e gerenciar imóveis — ideal para corretores e compradores',
 }
 
 export default function RootLayout({

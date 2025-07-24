@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { motion, useMotionValue, animate } from 'motion/react'
+import { useEffect, useRef } from 'react'
+import { motion, useMotionValue, animate } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { usePathname } from 'next/navigation'
+import { useTheme } from 'next-themes'
 
 interface AnimatedGradientBackgroundProps {
   className?: string
@@ -23,7 +24,8 @@ interface Beam {
   pulse: number
   pulseSpeed: number
 }
-export function SunBeams({
+
+export function Beams({
   className,
   intensity,
   children,
@@ -32,17 +34,20 @@ export function SunBeams({
   const containerRef = useRef<HTMLDivElement>(null)
   const beamsRef = useRef<Beam[]>([])
   const animationFrameRef = useRef<number>(0)
-  const MINIMUM_BEAMS = 20
+  const minimumBeams = 15
   const pathname = usePathname()
-  const resolvedIntensity = intensity ?? getSunBeamsIntensity(pathname)
-  const [isDark, setIsDark] = useState(false)
+  const resolvedIntensity = intensity ?? getBeamsIntensity(pathname)
+  const { theme, systemTheme } = useTheme()
+  const currentTheme = theme === 'system' ? systemTheme : theme
+  const isDark = currentTheme === 'dark'
 
   function createBeamWithTheme(width: number, height: number): Beam {
     const angle = -35 + Math.random() * 10
-    // Quentes no dark, frios (azul/roxo) no light
+    // Cores consistentes com o tema
     const hue = isDark
-      ? 10 + Math.random() * 50 // quentes: laranja, amarelo, vermelho
-      : 210 + Math.random() * 40 // frios: azul (210-240), roxo (até 250)
+      ? 20 + Math.random() * 30 // Tons quentes (laranja/amarelo) para tema escuro
+      : 200 + Math.random() * 40 // Tons frios (azul/roxo) para tema claro
+
     return {
       x: Math.random() * width * 1.5 - width * 0.25,
       y: Math.random() * height * 1.5 - height * 0.25,
@@ -63,7 +68,9 @@ export function SunBeams({
     medium: 0.8,
     strong: 1,
   }
+
   const animatedOpacity = useMotionValue(opacityMap[resolvedIntensity])
+
   useEffect(() => {
     animate(animatedOpacity, opacityMap[resolvedIntensity], {
       duration: 1.2,
@@ -86,10 +93,10 @@ export function SunBeams({
       canvas.height = rect.height * dpr
       canvas.style.width = `${rect.width}px`
       canvas.style.height = `${rect.height}px`
-      ctx.setTransform(1, 0, 0, 1, 0, 0) // Reset transform before scaling
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.scale(dpr, dpr)
 
-      const totalBeams = MINIMUM_BEAMS * 1.5
+      const totalBeams = minimumBeams * 1.5
       beamsRef.current = Array.from({ length: totalBeams }, () =>
         createBeamWithTheme(canvas.width, canvas.height)
       )
@@ -100,9 +107,7 @@ export function SunBeams({
 
     function resetBeam(beam: Beam, index: number, totalBeams: number) {
       if (!canvas) return beam
-      // Cria um novo beam com a cor correta do tema
       const newBeam = createBeamWithTheme(canvas.width, canvas.height)
-      // Mantém a posição x baseada na coluna para manter o padrão
       const column = index % 3
       const spacing = canvas.width / 3
       newBeam.x =
@@ -171,43 +176,18 @@ export function SunBeams({
 
     return () => {
       window.removeEventListener('resize', updateCanvasSize)
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
+      cancelAnimationFrame(animationFrameRef.current)
     }
-  }, [animatedOpacity])
-
-  useEffect(() => {
-    // Detecta tema inicial
-    const checkTheme = () => {
-      if (typeof window !== 'undefined') {
-        setIsDark(document.documentElement.classList.contains('dark'))
-      }
-    }
-    checkTheme()
-    // Observa mudanças de tema
-    const observer = new MutationObserver(checkTheme)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    })
-    return () => observer.disconnect()
-  }, [])
-
-  // Recria todos os beams ao trocar de tema
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const totalBeams = MINIMUM_BEAMS * 1.5
-    beamsRef.current = Array.from({ length: totalBeams }, () =>
-      createBeamWithTheme(canvas.width, canvas.height)
-    )
-  }, [isDark])
+  }, [animatedOpacity, isDark])
 
   return (
     <div
       ref={containerRef}
-      className={cn('relative w-full overflow-hidden bg-white-950', className)}
+      className={cn(
+        'relative w-full overflow-hidden',
+        isDark ? 'bg-gray-950' : 'bg-white-50',
+        className
+      )}
       style={{
         minHeight: '1px',
         ...(typeof window !== 'undefined' && containerRef.current
@@ -221,7 +201,13 @@ export function SunBeams({
         style={{ filter: 'blur(15px)' }}
       />
       <motion.div
-        className='absolute inset-0 bg-white-950/5 z-0 pointer-events-none'
+        className='absolute inset-0 z-0 pointer-events-none'
+        style={{
+          backgroundColor: isDark
+            ? 'rgba(10, 10, 20, 0.1)'
+            : 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(50px)',
+        }}
         animate={{
           opacity: [0.05, 0.15, 0.05],
         }}
@@ -230,27 +216,22 @@ export function SunBeams({
           ease: 'easeInOut',
           repeat: Number.POSITIVE_INFINITY,
         }}
-        style={{
-          backdropFilter: 'blur(50px)',
-        }}
       />
       {children && <div className='relative z-10'>{children}</div>}
     </div>
   )
 }
 
-export function getSunBeamsIntensity(
+// TODO verificar intensidade dos beams
+export function getBeamsIntensity(
   pathname?: string
 ): 'subtle' | 'medium' | 'strong' {
-  if (!pathname) {
-    if (typeof window !== 'undefined') {
-      pathname = window.location.pathname
-    } else {
-      return 'strong'
-    }
-  }
-  if (pathname === '/') return 'strong'
-  if (pathname.startsWith('/imoveis') || pathname.startsWith('/about'))
-    return 'subtle'
-  return 'medium'
+  // const path =
+  //   pathname ??
+  //   (typeof window !== 'undefined' ? window.location.pathname : null)
+  // if (path === '/' || !path) return 'strong'
+  // if (path.startsWith('/imoveis') || path.startsWith('/agentes'))
+  //   return 'subtle'
+  // return 'medium'
+  return 'strong'
 }

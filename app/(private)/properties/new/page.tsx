@@ -18,7 +18,7 @@ import {
 import { SidebarTrigger } from '@/components/ui/sidebar'
 import { ArrowLeft, Upload, X } from 'lucide-react'
 import Link from 'next/link'
-import { useToast } from '@/app/hooks/use-toast'
+import { useToast } from '@/hooks/use-toast'
 
 export default function NewPropertyPage() {
   const { toast } = useToast()

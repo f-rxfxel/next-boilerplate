@@ -1,13 +1,11 @@
 'use client'
+// TODO botar um title, mas é client ent n sei
 
-import { useState, useMemo, useEffect } from 'react'
 import Lenis from 'lenis'
-import { SunBeams } from '@/components/sun-beams'
+import { useEffect } from 'react'
 import { unstable_ViewTransition as ViewTransition } from 'react'
 import { Libre_Caslon_Text } from 'next/font/google'
 import { motion } from 'motion/react'
-import { GlassContainer } from '@/components/glass-card'
-import Image from 'next/image'
 import Link from 'next/link'
 
 const libreCaslonText = Libre_Caslon_Text({
@@ -17,7 +15,7 @@ const libreCaslonText = Libre_Caslon_Text({
   display: 'swap',
 })
 
-export default function Component() {
+export default function Properties() {
   useEffect(() => {
     const lenis = new Lenis()
     function raf(time: any) {
@@ -26,7 +24,6 @@ export default function Component() {
     }
     requestAnimationFrame(raf)
   }, [])
-
   // TODO se der error, chamar 'throw new Error("Erro ao carregar os imóveis")'
   // TODO ajustar o roteamento para o id do imóvel correto
   const imovelId = 1

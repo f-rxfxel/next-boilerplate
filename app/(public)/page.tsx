@@ -1,9 +1,9 @@
 'use client'
-import { Footer } from '@/components/footer'
-import { SunBeams } from '@/components/sun-beams'
+
 import { unstable_ViewTransition as ViewTransition } from 'react'
 import { motion } from 'motion/react'
 import { Tenor_Sans } from 'next/font/google'
+import Linguica from '@/components/linguica'
 
 const tenor = Tenor_Sans({ subsets: ['latin'], weight: '400' })
 
@@ -28,6 +28,7 @@ export default function Home() {
           Seu acesso exclusivo ao extraordinário.
         </motion.p>
       </main>
+      <Linguica /> {/* TODO REMOVER ISSO */}
     </ViewTransition>
   )
 }
